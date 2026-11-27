@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pedidos ENACO</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%231d5a35'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-size='19' font-family='Arial' font-weight='700' fill='%23e0a526'%3EE%3C/text%3E%3C/svg%3E">
+<script>try{var th=localStorage.getItem('enaco_theme');if(th)document.documentElement.dataset.theme=th}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: claro y cercano, como una bodega andina ordenada
+   IDEA: la etiqueta de una caja de filtrantes: banda verde, sello y datos precisos
+   PICTURE: rama de hoja de coca dibujada en SVG sobre el campo verde
+   COLOUR and TYPE: verde hoja profundo, blanco, acento oro de cosecha; Outfit + Inter
+   LAYOUT: tienda = catálogo + carrito; panel = pestañas con tablas de trabajo */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0f1712);--ink:light-dark(#14201a,#e8efe9);--mut:light-dark(#5b6b61,#9fb0a5);--leaf:#1d5a35;--leaf2:light-dark(#e9f2ec,#1a2a20);--gold:#e0a526;--line:light-dark(#d9e2dc,#2a3a30);--card:light-dark(#fff,#15211a);--bad:#b4231a;--ok:#1d7a3e}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:Outfit,Inter,sans-serif;line-height:1.1;margin:0 0 .4em;text-wrap:balance}
+h1{font-size:clamp(32px,5vw,50px)}h2{font-size:26px}h3{font-size:18px}
+a{color:inherit}
+.band{padding:clamp(24px,4vw,56px) max(5vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+header.top{background:var(--leaf);color:#fff;padding:12px max(5vw,16px);display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.brand{font:700 20px Outfit,sans-serif;display:flex;gap:10px;align-items:center}
+.seal{width:34px;height:34px;border-radius:50%;background:var(--gold);display:grid;place-items:center;color:var(--leaf);font-weight:700}
+nav a{color:#fff;text-decoration:none;padding:10px 14px;border-radius:8px;display:inline-block;min-height:44px}
+nav a.on{background:rgba(255,255,255,.16)}
+.hero{background:var(--leaf);color:#fff;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:24px;align-items:center}
+.hero p{font-size:17px;max-width:60ch;opacity:.92}
+.hero svg{width:100%;height:auto;max-height:300px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.chip{background:rgba(255,255,255,.14);border-radius:99px;padding:6px 12px;font-size:14px}
+.shop{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:28px;align-items:start}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.prod{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.prod .tag{font-size:13px;color:var(--leaf);background:var(--leaf2);border-radius:99px;padding:2px 10px;align-self:flex-start}
+:root[data-theme=dark] .prod .tag{color:#9fd8b0}
+.price{font:600 20px Outfit,sans-serif;white-space:nowrap}.mut{color:var(--mut);font-size:14px}
+.qty{display:flex;align-items:center;gap:6px;margin-top:auto}
+.qty button{width:44px;height:44px;font-size:20px}
+.qty input{width:64px;text-align:center}
+button,.btn{font:600 15px Inter,sans-serif;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;min-height:44px;padding:0 16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+button.pri,.btn.pri{background:var(--leaf);color:#fff;border-color:var(--leaf)}
+.gold{background:var(--gold);color:#1b1404;border-color:var(--gold)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+input,select,textarea{font:16px Inter,sans-serif;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;min-height:44px;width:100%}
+label{font-size:14px;font-weight:500;display:block;margin:10px 0 4px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.cart{position:sticky;top:12px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.tot{font:700 22px Outfit,sans-serif;display:flex;justify-content:space-between;margin:12px 0}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 12px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:12px 0}.check input{width:22px;min-height:22px;margin-top:2px;flex:none}
+.prog{height:14px;background:var(--leaf2);border-radius:99px;overflow:hidden;margin:10px 0 6px}.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--leaf),#3c9a5f);border-radius:99px;transition:width .12s linear}
+.dlcard{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}.dlcard b{font-family:Outfit,sans-serif;font-size:17px}
+.help h3{margin-top:18px}.help ol,.help ul{padding-left:20px}.help li{margin:4px 0}.key{font:600 18px Outfit,sans-serif;background:var(--leaf2);padding:2px 10px;border-radius:6px}
+.msg{padding:12px;border-radius:10px;margin:10px 0;font-size:15px}.msg.err{background:#fde8e6;color:#7a160f}.msg.ok{background:#e6f4ea;color:#14532d}
+pre.out{white-space:pre-wrap;background:var(--leaf2);padding:12px;border-radius:10px;font-size:14px;max-height:260px;overflow:auto}
+footer{border-top:1px solid var(--line);color:var(--mut);font-size:14px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}.tabs button.on{background:var(--leaf);color:#fff;border-color:var(--leaf)}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-weight:600;background:var(--leaf2)}td.n,th.n{text-align:right;white-space:nowrap}
+td input,td select{min-width:120px;min-height:38px;padding:6px;font-size:14px}
+.scroll{overflow-x:auto}#tPed{min-width:1180px}#tPed td:nth-child(3){min-width:210px}#tPed td:nth-child(4){min-width:190px}@media(max-width:600px){#tPed{min-width:0}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}.kpi b{display:block;font:700 28px Outfit,sans-serif}
+.bar{display:grid;grid-template-columns:9em minmax(0,1fr) 7em;gap:8px;align-items:center;font-size:14px;margin:6px 0}.bar i{display:block;height:14px;background:var(--leaf);border-radius:4px}
+.warn{color:var(--bad);font-weight:600}.good{color:var(--ok);font-weight:600}
+.hide{display:none!important}
+@media(max-width:860px){.shop{grid-template-columns:1fr}.cart{position:static}.hero{grid-template-columns:1fr}.hero svg{max-height:180px}}
+@media(max-width:600px){.two{grid-template-columns:1fr}table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;font-weight:600}.stack td:empty{display:none}.bar{grid-template-columns:7em minmax(0,1fr) 6em}}
+@media(prefers-reduced-motion:no-preference){.prod{transition:transform .15s}.prod:hover{transform:translateY(-2px)}}
+
+.hero{background:radial-gradient(1200px 400px at 85% 0,#2f7d4a 0,transparent 60%),var(--leaf)}
+.hero .btn{margin-top:18px;min-height:48px;padding:0 22px}
+.cartbtn b{background:var(--gold);color:#1b1404;border-radius:99px;padding:1px 8px;margin-left:6px;font-size:13px}
+.pic{border-radius:10px;overflow:hidden;background:linear-gradient(160deg,var(--leaf2),var(--bg));aspect-ratio:4/3;display:grid;place-items:center}
+.pic svg,.pic img{width:100%;height:100%;object-fit:cover;display:block}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px}.tools input{flex:1 1 200px}.tools select{flex:0 1 200px}
+.perks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.perk{display:flex;gap:12px;align-items:flex-start}.perk svg{flex:none;width:40px;height:40px;padding:8px;border-radius:12px;background:var(--leaf2);stroke:var(--leaf);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+:root[data-theme=dark] .perk svg{stroke:#9fd8b0}
+.perk b{font-family:Outfit,sans-serif;display:block}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;counter-reset:s;padding:0;list-style:none;margin:0}
+.steps li{counter-increment:s;background:var(--leaf2);border-radius:14px;padding:16px 16px 16px 58px;position:relative}
+.steps li::before{content:counter(s);position:absolute;left:14px;top:14px;width:32px;height:32px;border-radius:50%;background:var(--leaf);color:#fff;display:grid;place-items:center;font:700 16px Outfit,sans-serif}
+.faq details{border-bottom:1px solid var(--line);padding:12px 0}.faq summary{cursor:pointer;font:600 17px Outfit,sans-serif;min-height:32px}.faq p{margin:8px 0 0;color:var(--mut)}
+.x{min-height:28px;height:28px;width:28px;padding:0;font-size:12px;margin-left:6px;border-radius:50%}
+.wafloat{position:fixed;right:16px;bottom:16px;z-index:20;background:#25a244;color:#fff;border-radius:99px;padding:0 18px;min-height:52px;display:inline-flex;align-items:center;gap:8px;font-weight:600;text-decoration:none;box-shadow:0 6px 18px rgba(0,0,0,.28)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:10px;opacity:0;pointer-events:none;z-index:30;max-width:90vw;font-size:15px}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+@media(prefers-reduced-motion:no-preference){#toast{transition:opacity .2s,transform .2s}html{scroll-behavior:smooth}}
+html{scroll-padding-top:84px}
+header.top{position:sticky;top:0;z-index:15;box-shadow:0 2px 14px rgba(0,0,0,.22)}.cart{top:84px}
+.tbtn{width:44px;padding:0;background:rgba(255,255,255,.14);color:#fff;border-color:transparent;font-size:18px;margin-left:6px}
+button,.btn{transition:filter .15s,transform .1s}button:hover,.btn:hover{filter:brightness(1.1)}button:active,.btn:active{transform:translateY(1px)}
+.prod{box-shadow:0 1px 2px rgba(0,0,0,.06)}.prod:hover{box-shadow:0 10px 26px rgba(0,0,0,.14)}
+tbody tr:hover{background:var(--leaf2)}
+.kpi{border-left:4px solid var(--gold)}.kpi b{color:var(--leaf)}:root[data-theme=dark] .kpi b{color:#9fd8b0}
+.bdg{background:var(--gold);color:#1b1404;border-radius:99px;padding:0 8px;margin-left:8px;font-size:12px;line-height:20px;display:inline-block}.bdg:empty{display:none}
+select.st{font-weight:600;border-left-width:5px}
+.st-Registrado{border-left-color:#8a94a0}.st-Pagado{border-left-color:#2b7bd1}.st-Preparado{border-left-color:#e0a526}.st-Facturado{border-left-color:#7a5ad1}.st-Enviado{border-left-color:#1ea5b8}.st-Entregado{border-left-color:#2f9e57}.st-Anulado{border-left-color:#d1453b}
+#login{margin:6vh auto;box-shadow:0 14px 36px rgba(0,0,0,.2);border-top:5px solid var(--gold)}
+@media print{header.top,.tabs,.wafloat,#toast,button{display:none!important}}
+.tl{list-style:none;margin:18px 0;padding:0}.tl li{position:relative;padding:0 0 22px 46px;min-height:50px}
+.tl li::before{content:"";position:absolute;left:13px;top:30px;bottom:0;width:2px;background:var(--line)}.tl li:last-child::before{display:none}
+.tl i{position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:var(--bg);display:grid;place-items:center;font-style:normal;font-size:14px}
+.tl .ok i{background:var(--leaf);border-color:var(--leaf);color:#fff}.tl .ok::before{background:var(--leaf)}
+.tl .now i{background:var(--gold);border-color:var(--gold);color:#1b1404}.tl .now b{font-size:18px}
+.tl .wait{color:var(--mut)}.tl .off{opacity:.45}
+</style>
+<script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="seal">E</span>ENACO S.A. · Pedidos en línea</div>
+  <nav><a href="#tienda" id="nTienda">Tienda</a><a href="#seguimiento" id="nSeg">Seguir pedido</a><a href="#carrito" class="cartbtn" aria-label="Ir a tu pedido">Mi pedido <b id="cnt">0</b></a><a href="#panel" id="nPanel">Panel de gestión</a><button id="theme" class="tbtn" type="button" aria-label="Cambiar entre tema claro y oscuro">◐</button></nav>
+</header>
+
+<main id="vTienda">
+  <section class="band hero">
+    <div class="wrap" style="margin:0">
+      <h1>Productos de la Empresa Nacional de la Coca, con envío a Piura</h1>
+      <p>Elige tus productos, completa tus datos y envía tu pedido por WhatsApp. Te confirmamos stock, pago, comprobante electrónico y fecha de entrega.</p>
+      <div class="chips"><span class="chip">Línea Delisse</span><span class="chip">Boleta o factura electrónica</span><span class="chip">Envío a Piura y regiones</span></div>
+      <a class="btn gold" href="#catalogo">Ver productos</a>
+    </div>
+    <svg viewBox="0 0 420 300" role="img" aria-label="Rama de hojas de coca">
+      <defs><linearGradient id="lf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7cc48f"/><stop offset="1" stop-color="#2f7d4a"/></linearGradient>
+      <path id="leaf" d="M0 0 C 30 -38 92 -40 130 0 C 92 40 30 38 0 0 Z"/></defs>
+      <ellipse cx="215" cy="270" rx="170" ry="16" fill="rgba(0,0,0,.18)"/>
+      <path d="M60 250 C 140 200 220 150 360 60" stroke="#c9e6cf" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <g fill="url(#lf)" stroke="#e9f6ec" stroke-width="1.5">
+        <use href="#leaf" transform="translate(110 220) rotate(-80)"/><use href="#leaf" transform="translate(120 214) rotate(10)"/>
+        <use href="#leaf" transform="translate(185 176) rotate(-95)"/><use href="#leaf" transform="translate(195 170) rotate(-5)"/>
+        <use href="#leaf" transform="translate(260 128) rotate(-110)"/><use href="#leaf" transform="translate(270 122) rotate(-20)"/>
+        <use href="#leaf" transform="translate(340 72) rotate(-40) scale(.8)"/>
+      </g>
+      <g stroke="#e9f6ec" stroke-width="1" opacity=".7"><path d="M120 214 L245 192"/><path d="M195 170 L322 160"/><path d="M270 122 L388 80"/></g>
+      <circle cx="372" cy="230" r="34" fill="#e0a526"/><text x="372" y="236" text-anchor="middle" font-family="Outfit,sans-serif" font-weight="700" font-size="16" fill="#1d5a35">Perú</text>
+    </svg>
+  </section>
+
+
+  <section class="band"><div class="wrap perks">
+    <div class="perk"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19C5 9 11 4 20 4c0 9-5 15-15 15z"/><path d="M5 19L14 10"/></svg><div><b>Hoja de coca natural</b><span class="mut">Infusiones y polvo de hoja de coca, libres de cafeína.</span></div></div>
+    <div class="perk"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="3"/><path d="M2 11h20"/></svg><div><b>Paga como prefieras</b><span class="mut">Yape, Plin, transferencia o depósito en el Banco de la Nación.</span></div></div>
+    <div class="perk"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg><div><b>Envío a Piura y regiones</b><span class="mut">A domicilio o recojo en agencia.</span></div></div>
+    <div class="perk"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg><div><b>Boleta o factura electrónica</b><span class="mut">Con tu DNI o RUC, según lo que necesites.</span></div></div>
+  </div></section>
+  <section class="band" id="catalogo" style="padding-bottom:0"><div class="wrap"></div></section>
+  <section class="band"><div class="wrap shop">
+    <div>
+      <h2>Catálogo</h2>
+      <div class="tools"><input id="q" type="search" placeholder="Buscar producto…" aria-label="Buscar producto"><select id="ln" aria-label="Filtrar por línea"></select></div>
+      <p class="mut" id="noPrice"></p>
+      <div class="grid" id="catalog"></div>
+    </div>
+    <aside id="carrito" class="cart box" aria-labelledby="cartT">
+      <h2 id="cartT">Tu pedido</h2>
+      <div id="cartList"><p class="mut">Aún no agregas productos.</p></div>
+      <div class="tot"><span>Total referencial</span><span id="cartTot">S/ 0.00</span></div>
+      <form id="fPedido" novalidate>
+        <label for="cNom">Nombre o razón social</label><input id="cNom" autocomplete="name" required>
+        <div class="two">
+          <div><label for="cComp">Comprobante</label><select id="cComp"><option>Boleta</option><option>Factura</option></select></div>
+          <div><label for="cDoc">DNI o RUC</label><input id="cDoc" inputmode="numeric" required></div>
+          <div><label for="cTel">Celular</label><input id="cTel" inputmode="tel" autocomplete="tel" required></div>
+          <div><label for="cCiu">Ciudad</label><input id="cCiu" value="Piura" required></div>
+        </div>
+        <div class="two"><div><label for="cDis">Distrito</label><input id="cDis" value="Piura" required></div><div><label for="cEnt">Tipo de entrega</label><select id="cEnt"><option>Envío a domicilio</option><option>Recojo en agencia</option></select></div></div>
+        <label for="cDir">Dirección de entrega</label><input id="cDir" autocomplete="street-address" required>
+        <label for="cRef">Referencia (opcional)</label><input id="cRef">
+        <label for="cPag">Forma de pago</label><select id="cPag"><option>Yape / Plin</option><option>Transferencia bancaria</option><option>Depósito en Banco de la Nación</option></select>
+        <label for="cMail">Correo (opcional)</label><input id="cMail" type="email" autocomplete="email">
+        <label class="check"><input type="checkbox" id="cOk"><span>Autorizo a ENACO S.A. a tratar mis datos solo para gestionar este pedido, conforme a la Ley N.° 29733. Puedo ejercer mis derechos de acceso, rectificación, cancelación y oposición escribiendo al mismo canal.</span></label>
+        <div id="fMsg"></div>
+        <button class="pri" style="width:100%">Confirmar pedido</button>
+      </form>
+      <div id="done" class="hide">
+        <div class="dlcard" aria-live="polite">
+          <b id="dlTitle">Generando tu nota de pedido…</b>
+          <div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progBar"><i id="progFill"></i></div>
+          <div class="mut" id="dlState">Preparando el PDF de tu compra</div>
+          <button id="pdfOrder" class="pri hide" style="width:100%;margin-top:10px">Descargar nota de pedido (PDF)</button>
+          <p class="mut" id="pdfMsg"></p>
+        </div>
+        <a class="btn gold" id="waLink" href="#" style="width:100%">Enviar pedido a ENACO por WhatsApp</a>
+        <p class="mut">Tu código de pedido: <b id="doneCode"></b>. Guárdalo para seguir tu pedido.</p>
+        <a class="btn" id="trackLink" href="#seguimiento" style="width:100%;margin-bottom:8px">Seguir mi pedido</a>
+        <p class="mut" id="waNote"></p>
+        <pre class="out hide" id="orderTxt"></pre>
+        <button id="newOrder" style="width:100%">Hacer otro pedido</button>
+      </div>
+    </aside>
+  </div></section>
+
+  <section class="band"><div class="wrap"><h2>Cómo comprar</h2>
+    <ol class="steps"><li><b>Elige tus productos</b><br><span class="mut">Agrégalos desde el catálogo.</span></li><li><b>Completa tus datos</b><br><span class="mut">Comprobante, entrega y forma de pago.</span></li><li><b>Descarga tu nota y envíala</b><br><span class="mut">Se abre WhatsApp con el pedido escrito.</span></li><li><b>Te confirmamos</b><br><span class="mut">Stock, pago, comprobante y fecha de entrega.</span></li></ol></div></section>
+  <section class="band" style="padding-top:0"><div class="wrap faq"><h2>Preguntas frecuentes</h2>
+    <details><summary>¿Cómo pago mi pedido?</summary><p>Después de enviar tu pedido por WhatsApp, te confirmamos el stock y los datos para pagar por Yape/Plin, transferencia o depósito.</p></details>
+    <details><summary>¿Hacen envíos fuera de Piura?</summary><p>Sí, a regiones por agencia. Elige «Recojo en agencia» o envío a domicilio al armar tu pedido.</p></details>
+    <details><summary>¿Recibiré boleta o factura?</summary><p>Sí. Elige el comprobante e ingresa tu DNI o RUC (factura requiere RUC de 11 dígitos).</p></details>
+    <details><summary>¿Cómo hago un reclamo?</summary><p>Usa el Libro de Reclamaciones virtual que aparece al pie de la página, o escríbenos por WhatsApp.</p></details>
+  </div></section>
+  <a id="waFloat" class="wafloat hide" href="#" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <footer class="band"><div class="wrap">ENACO S.A. · RUC 20114883230 · Empresa del Estado bajo el ámbito de FONAFE. <span id="reclam"></span><br>Prototipo académico del curso de Comercio Electrónico, Universidad Nacional de Piura. No es el canal oficial de venta de ENACO S.A.</div></footer>
+</main>
+
+<main id="vSeg" class="hide"><section class="band"><div class="wrap" style="max-width:760px">
+  <h1 style="font-size:clamp(28px,4vw,40px)">Seguimiento de tu pedido</h1>
+  <p class="mut">Escribe el código que recibiste al confirmar tu pedido (empieza con ENC-) o abre el enlace que ENACO te envió por WhatsApp.</p>
+  <form id="fSeg" class="box"><label for="sCod">Código del pedido</label><input id="sCod" placeholder="ENC-20261126-1234" autocomplete="off"><div id="sMsg"></div><button class="pri" style="margin-top:12px">Buscar pedido</button></form>
+  <div id="sRes" aria-live="polite"></div><div id="sMis"></div>
+</div></section></main>
+
+<main id="vPanel" class="hide"><section class="band"><div class="wrap">
+  <div id="login" class="box" style="max-width:420px">
+    <h2>Panel de gestión</h2><p class="mut" id="loginHint"></p>
+    <form id="fLogin"><label for="pw">Clave de acceso</label><input id="pw" type="password" autocomplete="current-password"><div id="lMsg"></div><button class="pri" style="margin-top:12px">Ingresar</button></form>
+  </div>
+  <div id="app" class="hide">
+    <div class="tabs" role="tablist">
+      <button data-t="ped" class="on">Pedidos<b class="bdg" id="bPed"></b></button><button data-t="inv">Inventario<b class="bdg" id="bInv"></b></button><button data-t="pro">Productos</button><button data-t="ind">Indicadores</button><button data-t="cfg">Configuración</button><button data-t="ayu">Ayuda</button><button id="logout">Salir</button>
+    </div>
+    <div data-p="ped">
+      <div class="box"><h3>Registrar pedido recibido por WhatsApp</h3><p class="mut">Pega el mensaje completo del cliente. El sistema lee el código y los datos del pedido.</p>
+        <textarea id="paste" rows="4"></textarea><div id="pMsg"></div><button class="pri" id="imp" style="margin-top:8px">Registrar pedido</button></div>
+      <div style="display:flex;gap:10px;align-items:center;margin:18px 0 8px;flex-wrap:wrap"><h3 style="margin:0">Pedidos</h3><input id="qPed" type="search" placeholder="Buscar por código, cliente, DNI o celular" aria-label="Buscar pedido" style="max-width:340px"><select id="fEst" style="max-width:220px"><option value="">Todos los estados</option></select></div>
+      <p class="mut" id="trkHint"></p><div class="scroll"><table class="stack" id="tPed"></table></div>
+    </div>
+    <div data-p="inv" class="hide">
+      <div class="box"><h3>Ingreso al almacén</h3>
+        <form id="fMov"><div class="two">
+          <div><label for="mPro">Producto</label><select id="mPro"></select></div>
+          <div><label for="mQ">Cantidad</label><input id="mQ" type="number" min="1" required></div>
+          <div><label for="mLote">Lote</label><input id="mLote" required></div>
+          <div><label for="mVen">Fecha de vencimiento</label><input id="mVen" type="date" required></div>
+          <div><label for="mAlm">Almacén</label><select id="mAlm"><option>Planta Cusco</option><option>Sede Lima</option><option>Almacén Piura</option></select></div>
+          <div><label for="mTipo">Tipo</label><select id="mTipo"><option>Entrada</option><option>Ajuste de salida</option></select></div>
+        </div><div id="mMsg"></div><button class="pri" style="margin-top:12px">Guardar movimiento</button></form></div>
+      <h3 style="margin-top:18px">Stock por producto</h3><div class="scroll"><table class="stack" id="tStock"></table></div>
+      <h3 style="margin-top:18px">Movimientos y lotes</h3><div class="scroll"><table class="stack" id="tMov"></table></div>
+    </div>
+    <div data-p="pro" class="hide"><p class="mut">Los precios y el stock mínimo se reflejan de inmediato en la tienda y en las alertas.</p><div class="scroll"><table class="stack" id="tPro"></table></div><div id="proMsg"></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button id="addPro">Agregar producto</button><button id="delSel">Eliminar seleccionados</button></div>
+      <div class="box" style="margin-top:14px"><h3>Foto del producto</h3><p class="mut">Sube una foto real (JPG o PNG); se reduce automáticamente y se ve en la tienda. Sin foto se muestra una ilustración.</p>
+        <div class="two"><div><label for="fotoPro">Producto</label><select id="fotoPro"></select></div><div><label for="fotoIn">Archivo</label><input id="fotoIn" type="file" accept="image/*"></div></div>
+        <div id="fotoMsg"></div><button id="fotoDel" style="margin-top:8px">Quitar foto</button></div></div>
+    <div data-p="ind" class="hide"><div class="kpis" id="kpis"></div><div class="two"><div class="box"><h3>Pedidos por estado</h3><div id="bEst"></div></div><div class="box"><h3>Ventas por producto</h3><div id="bPro"></div></div></div><div class="box" style="margin-top:12px"><h3>Ventas por ciudad</h3><div id="bCiu"></div></div></div>
+    <div data-p="ayu" class="hide"><div class="box help">
+      <h2>Cómo funciona el panel de gestión</h2>
+      <p>El panel es la parte interna de la página web, solo para el personal de ENACO. Se entra con <a href="#panel">#panel</a> al final de la dirección de la página o con el botón «Panel de gestión» del menú.</p>
+      <h3>1. Acceso con clave</h3>
+      <ul><li>La clave inicial se la entrega el administrador.</li><li>Se cambia en Configuración → Cambiar clave (pide la clave actual y la nueva dos veces).</li><li>El botón «Salir» cierra la sesión; al cerrar la pestaña también se cierra.</li></ul>
+      <h3>2. Pedidos</h3>
+      <ol><li>El cliente arma su pedido en la tienda, descarga su nota en PDF y lo envía por WhatsApp.</li><li>El personal copia el mensaje completo de WhatsApp, lo pega en «Registrar pedido recibido» y pulsa «Registrar pedido». El sistema lee el código #DATOS y crea el pedido con todos sus datos.</li><li>Se avanza el estado: Registrado → Pagado → Preparado → Facturado → Enviado → Entregado (o Anulado). El panel no deja pasar a Pagado si falta stock.</li><li>Se anotan el número de boleta o factura y de la guía de remisión emitidas en SEE-SOL, y el operador logístico con su número de seguimiento.</li><li>El botón «PDF» de cada pedido descarga su nota de pedido actualizada.</li></ol>
+      <h3>3. Inventario</h3>
+      <ul><li>Cada ingreso de mercadería se registra con producto, cantidad, lote, vencimiento y almacén.</li><li>Stock físico = entradas − salidas por ventas pagadas; Reservado = pedidos Registrados; Disponible = físico − reservado.</li><li>«Reponer stock» aparece cuando el disponible llega al mínimo; los lotes que vencen en menos de 90 días salen en rojo.</li></ul>
+      <h3>4. Productos</h3><p>Aquí se cambian nombre, precio, stock mínimo y si el producto aparece en la tienda. Los cambios se ven al instante en el catálogo.</p>
+      <h3>5. Indicadores</h3><p>Resume pedidos, ventas confirmadas (desde Pagado en adelante), ticket promedio, pedidos por estado y ventas por producto y por ciudad.</p>
+      <h3>6. Seguimiento para el cliente</h3><ul><li>Al confirmar su pedido, el cliente recibe su código y puede verlo en «Seguir pedido».</li><li>El botón «WhatsApp» de cada pedido envía al cliente el estado actual y un enlace de seguimiento con el avance.</li><li>El enlace muestra el estado del momento en que se generó; cuando cambies el estado, vuelve a pulsar «WhatsApp» para enviar el enlace actualizado.</li><li>Para que el enlace funcione en el celular del cliente, la tienda debe estar publicada en internet y su dirección escrita en Configuración.</li></ul>
+      <h3>7. Configuración</h3><ul><li>Número de WhatsApp de ENACO al que llegan los pedidos y enlace al Libro de Reclamaciones.</li><li>Respaldo: los datos se guardan en el navegador de este equipo. Descarga o copia el respaldo cada día y restáuralo en otro equipo si hace falta.</li><li>Exportar pedidos a CSV para abrirlos en Excel.</li></ul>
+    </div></div>
+    <div data-p="cfg" class="hide"><div class="box"><form id="fCfg">
+      <label for="gWa">Número de WhatsApp de ENACO (con código de país, solo dígitos)</label><input id="gWa" inputmode="numeric" placeholder="51 seguido del número">
+      <label for="gUrl">Dirección web donde está publicada la tienda (para los enlaces de seguimiento)</label><input id="gUrl" type="url" placeholder="https://mitienda.example">
+      <label for="gRec">Enlace al Libro de Reclamaciones virtual</label><input id="gRec" type="url">
+      
+      <div id="gMsg"></div><button class="pri" style="margin-top:12px">Guardar configuración</button></form></div>
+      <div class="box" style="margin-top:12px"><h3>Cambiar clave del panel</h3><form id="fPw">
+        <div class="two"><div><label for="pwOld">Clave actual</label><input id="pwOld" type="password" autocomplete="current-password"></div><div></div>
+        <div><label for="pwNew">Nueva clave (mínimo 6 caracteres)</label><input id="pwNew" type="password" autocomplete="new-password"></div><div><label for="pwNew2">Repite la nueva clave</label><input id="pwNew2" type="password" autocomplete="new-password"></div></div>
+        <div id="pwMsg"></div><button class="pri" style="margin-top:12px">Cambiar clave</button></form></div>
+      <div class="box" style="margin-top:12px"><h3>Datos de demostración</h3><p class="mut">El panel viene cargado con pedidos y lotes de ejemplo para la presentación; los precios corresponden a los de venta al público en supermercados. Bórralos antes de usarlo con clientes reales.</p><button id="clrDemo">Vaciar pedidos y movimientos</button></div>
+      <div class="box" style="margin-top:12px"><h3>Respaldo y exportación</h3><p class="mut">Los datos se guardan en este navegador. Haz un respaldo al cerrar cada día y restáuralo en otro equipo si hace falta.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button id="bkCopy">Copiar respaldo</button><button id="bkDown">Descargar respaldo (.json)</button><button id="csvDown">Descargar pedidos (.csv)</button></div>
+        <label for="bkIn">Restaurar respaldo (pegar contenido)</label><textarea id="bkIn" rows="3"></textarea><div id="bMsg"></div><button id="bkRest" style="margin-top:8px">Restaurar</button></div>
+    </div>
+  </div>
+</div></section></main>
+
+<script>
+{
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>'S/ '+Number(n||0).toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2});
+const ESTADOS=['Registrado','Pagado','Preparado','Facturado','Enviado','Entregado','Anulado'];
+const DESCUENTA=['Pagado','Preparado','Facturado','Enviado','Entregado'];
+const DEF={products:[
+ {id:'P001',name:'Infusión de coca Delisse Premium',line:'Delisse',desc:'Caja de 25 filtrantes de hoja de coca. Libre de cafeína.',price:4.99,min:120,active:true},
+ {id:'P002',name:'Infusión de hoja de coca Delisse',line:'Delisse',desc:'Caja de 50 filtrantes de hoja de coca.',price:11.90,min:60,active:true},
+ {id:'P003',name:'Hoja de coca en polvo Delisse Premium',line:'Derivados',desc:'Doypack de 250 g de hoja de coca natural micropulverizada.',price:27.00,min:30,active:true}],
+ moves:[
+ {date:'2026-11-02T09:00:00',id:'P001',tipo:'Entrada',q:600,lote:'DP25-2610-01',venc:'2028-05-31',alm:'Planta Cusco'},
+ {date:'2026-11-02T09:10:00',id:'P002',tipo:'Entrada',q:300,lote:'D50-2610-07',venc:'2028-04-30',alm:'Planta Cusco'},
+ {date:'2026-11-05T10:30:00',id:'P003',tipo:'Entrada',q:120,lote:'HP250-2608-03',venc:'2027-02-10',alm:'Sede Lima'},
+ {date:'2026-11-16T15:00:00',id:'P001',tipo:'Entrada',q:200,lote:'DP25-2611-02',venc:'2028-06-30',alm:'Almacén Piura'},
+ {date:'2026-11-18T11:00:00',id:'P002',tipo:'Ajuste de salida',q:4,lote:'D50-2610-07',venc:'2028-04-30',alm:'Planta Cusco'}],
+ orders:[
+ ['ENC-20261103-1042','2026-11-03T10:15:00',{nombre:'Bodega Santa Rosa',comp:'Boleta',doc:'70214583',tel:'969412538',ciudad:'Piura',dis:'Castilla',ent:'Envío a domicilio',dir:'Av. Guardia Civil 512',ref:'Frente al mercado',pago:'Yape / Plin'},[['P001',48],['P002',12]],'Entregado','B001-00000101','T001-00000051','Shalom · guía 845120'],
+ ['ENC-20261104-2287','2026-11-04T16:40:00',{nombre:'María Fernanda Chunga Sosa',comp:'Boleta',doc:'45872316',tel:'951237804',ciudad:'Piura',dis:'Piura',ent:'Envío a domicilio',dir:'Jr. Lima 845, dpto. 302',ref:'',pago:'Yape / Plin'},[['P001',6],['P003',1]],'Entregado','B001-00000102','T001-00000052','Olva Courier · 2041-77812'],
+ ['ENC-20261106-3318','2026-11-06T09:05:00',{nombre:'Café Naturista Vida Andina',comp:'Boleta',doc:'47120953',tel:'978552140',ciudad:'Sullana',dis:'Sullana',ent:'Recojo en agencia',dir:'Agencia Shalom Sullana, Av. José de Lama 1020',ref:'',pago:'Transferencia bancaria'},[['P002',40],['P003',6]],'Entregado','B001-00000103','T001-00000053','Shalom · guía 846377'],
+ ['ENC-20261110-4471','2026-11-10T12:20:00',{nombre:'Luis Alberto Zapata Ruiz',comp:'Boleta',doc:'02874519',tel:'942118063',ciudad:'Piura',dis:'Veintiséis de Octubre',ent:'Envío a domicilio',dir:'Mz. F lote 14, urb. Santa Margarita',ref:'Cerca al colegio',pago:'Depósito en Banco de la Nación'},[['P001',10]],'Enviado','B001-00000104','T001-00000054','Olva Courier · 2041-78930'],
+ ['ENC-20261112-5126','2026-11-12T18:45:00',{nombre:'Minimarket El Chilalo',comp:'Boleta',doc:'41588230',tel:'934870215',ciudad:'Piura',dis:'Piura',ent:'Envío a domicilio',dir:'Calle Tacna 230',ref:'',pago:'Transferencia bancaria'},[['P001',60],['P002',24]],'Enviado','B001-00000105','T001-00000055','Shalom · guía 847902'],
+ ['ENC-20261117-6093','2026-11-17T08:30:00',{nombre:'Rosa Elvira Távara Morales',comp:'Boleta',doc:'03659871',tel:'968301447',ciudad:'Paita',dis:'Paita',ent:'Recojo en agencia',dir:'Agencia Olva Paita, Jr. Junín 380',ref:'',pago:'Yape / Plin'},[['P002',4],['P003',2]],'Facturado','B001-00000106','T001-00000056',''],
+ ['ENC-20261119-7254','2026-11-19T14:10:00',{nombre:'Tienda Saludable Mi Tierra',comp:'Boleta',doc:'46025738',tel:'955620981',ciudad:'Piura',dis:'Castilla',ent:'Envío a domicilio',dir:'Av. Progreso 1180',ref:'Local esquina',pago:'Transferencia bancaria'},[['P001',36],['P003',4]],'Preparado','','',''],
+ ['ENC-20261121-8302','2026-11-21T11:55:00',{nombre:'Jorge Enrique Castro Peña',comp:'Boleta',doc:'40917326',tel:'987451230',ciudad:'Piura',dis:'Piura',ent:'Envío a domicilio',dir:'Av. Sánchez Cerro 1450',ref:'',pago:'Yape / Plin'},[['P002',3]],'Pagado','','',''],
+ ['ENC-20261123-9145','2026-11-23T17:25:00',{nombre:'Bodega Don Lucho',comp:'Boleta',doc:'02779634',tel:'944236718',ciudad:'Sullana',dis:'Bellavista',ent:'Envío a domicilio',dir:'Calle San Martín 410',ref:'',pago:'Depósito en Banco de la Nación'},[['P001',24],['P002',12]],'Pagado','','',''],
+ ['ENC-20261124-1378','2026-11-24T19:05:00',{nombre:'Ana Lucía Merino Vílchez',comp:'Boleta',doc:'72514063',tel:'916387452',ciudad:'Piura',dis:'Veintiséis de Octubre',ent:'Envío a domicilio',dir:'Urb. Los Titanes, calle 4, casa 12',ref:'',pago:'Yape / Plin'},[['P001',4],['P002',2]],'Registrado','','',''],
+ ['ENC-20261125-2864','2026-11-25T10:40:00',{nombre:'Botica Natural Salud Verde',comp:'Boleta',doc:'43380157',tel:'975014382',ciudad:'Talara',dis:'Pariñas',ent:'Recojo en agencia',dir:'Agencia Shalom Talara, Av. B s/n',ref:'',pago:'Transferencia bancaria'},[['P003',8],['P002',10]],'Registrado','','',''],
+ ['ENC-20261108-3901','2026-11-08T13:00:00',{nombre:'Pedro Pablo Ramos Ipanaqué',comp:'Boleta',doc:'44105829',tel:'961742035',ciudad:'Piura',dis:'Piura',ent:'Envío a domicilio',dir:'Jr. Arequipa 615',ref:'',pago:'Yape / Plin'},[['P003',1]],'Anulado','','','Cliente canceló antes del pago']
+ ].map(([code,date,c,it,estado,cpe,gre,oper])=>({code,date,c,items:it.map(([id,q])=>({id,q,p:{P001:4.99,P002:11.90,P003:27.00}[id]})),estado,cpe,gre,oper})),
+ cfg:{wa:'',rec:'',pw:'enaco2026'}};
+let db;
+const load=()=>{try{db=JSON.parse(localStorage.getItem('enaco_db_v2'))}catch(e){db=null}if(!db||!db.products)db=JSON.parse(JSON.stringify(DEF));if(!db.cfg.pw)db.cfg.pw='enaco2026';db.products=db.products.filter(p=>!(p.id==='P004'&&/caramelo/i.test(p.name)));};
+const save=()=>{try{localStorage.setItem('enaco_db_v2',JSON.stringify(db))}catch(e){}updateBadges()};
+load();
+const prod=id=>db.products.find(p=>p.id===id);
+let cart={};try{const c0=JSON.parse(localStorage.getItem('enaco_cart')||'{}');for(const id in c0)if(prod(id)&&prod(id).active&&c0[id]>0)cart[id]=c0[id]}catch(e){}
+let tT;const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>e.classList.remove('on'),1800)};
+const hue=id=>id.split('').reduce((a,c)=>a+c.charCodeAt(0),0)%3;
+function pic(p){if(p.img)return `<img src="${esc(p.img)}" alt="${esc(p.name)}" loading="lazy">`;
+  const c=[['#1d5a35','#e0a526'],['#2f7d4a','#f2d27a'],['#174a2c','#e8b84a']][hue(p.id)],pouch=/polvo|doypack|bolsa/i.test(p.name+p.desc),t=esc(p.name).slice(0,34);
+  const body=pouch?`<path d="M120 40h160l14 22-8 190H114L106 62z" fill="${c[0]}"/><path d="M106 62h188" stroke="#fff" stroke-opacity=".5" stroke-width="3"/><rect x="132" y="120" width="136" height="70" rx="8" fill="#fff"/>`
+   :`<rect x="110" y="40" width="180" height="210" rx="6" fill="${c[0]}"/><path d="M110 40l34-16h146l-0 16" fill="#2f7d4a"/><rect x="110" y="190" width="180" height="28" fill="${c[1]}"/><rect x="132" y="82" width="136" height="76" rx="8" fill="#fff"/>`;
+  return `<svg viewBox="0 0 400 300" role="img" aria-label="${t}"><ellipse cx="200" cy="268" rx="120" ry="12" fill="rgba(0,0,0,.15)"/>${body}
+  <g fill="#2f7d4a"><path d="M200 ${pouch?132:94}c-16-14-34-6-34 12 18 6 28 0 34-12z"/><path d="M200 ${pouch?132:94}c16-14 34-6 34 12-18 6-28 0-34-12z"/></g>
+  <text x="200" y="${pouch?176:146}" text-anchor="middle" font-family="Outfit,sans-serif" font-weight="700" font-size="17" fill="${c[0]}">Delisse</text>
+  <text x="200" y="${pouch?208:212}" text-anchor="middle" font-family="Outfit,sans-serif" font-weight="600" font-size="13" fill="${pouch?'#fff':c[0]}">${pouch?'250 g':'Filtrantes'}</text></svg>`}
+
+/* ---------- tienda ---------- */
+function renderCatalog(){
+  const ls=[...new Set(db.products.filter(p=>p.active&&p.line).map(p=>p.line))],cur=$('#ln').value;$('#ln').innerHTML='<option value="">Todas las líneas</option>'+ls.map(l=>`<option>${esc(l)}</option>`).join('');$('#ln').value=ls.includes(cur)?cur:'';
+  const q=$('#q').value.trim().toLowerCase(),ln=$('#ln').value,act=db.products.filter(p=>p.active&&(!ln||p.line===ln)&&(!q||(p.name+' '+p.desc).toLowerCase().includes(q)));
+  const w=(db.cfg.wa||'').replace(/\D/g,'');$('#waFloat').classList.toggle('hide',!w);$('#waFloat').href='https://wa.me/'+w;
+  $('#catalog').innerHTML=act.map(p=>`<article class="prod"><div class="pic">${pic(p)}</div><span class="tag">${esc(p.line)}</span><h3>${esc(p.name)}</h3><p class="mut">${esc(p.desc)}</p>
+   <div class="price">${p.price?money(p.price):'Precio por confirmar'}</div>
+   <div class="qty"><button type="button" data-m="${esc(p.id)}" aria-label="Quitar uno">−</button><input aria-label="Cantidad de ${esc(p.name)}" inputmode="numeric" data-q="${esc(p.id)}" value="${cart[p.id]||0}"><button type="button" data-p="${esc(p.id)}" aria-label="Agregar uno">+</button></div></article>`).join('')||'<p class="mut">No hay productos con ese filtro.</p>';
+  $('#noPrice').textContent=act.some(p=>!p.price)?'Los productos sin precio se confirman por WhatsApp antes del pago.':'';
+  $('#reclam').innerHTML=db.cfg.rec?`<a href="${esc(db.cfg.rec)}" rel="noopener">Libro de Reclamaciones virtual</a>`:'';
+  renderCart();
+}
+function setQ(id,q){q=Math.max(0,Math.min(999,parseInt(q)||0));if(q)cart[id]=q;else delete cart[id];const i=$(`[data-q="${id}"]`);if(i)i.value=q;renderCart();}
+function cartTotal(){return Object.entries(cart).reduce((s,[id,q])=>s+(prod(id)?.price||0)*q,0)}
+function renderCart(){
+  const it=Object.entries(cart);
+  $('#cartList').innerHTML=it.length?it.map(([id,q])=>{const p=prod(id);return `<div class="row"><span>${esc(p.name)} × ${q}<button type="button" class="x" data-rm="${esc(id)}" aria-label="Quitar ${esc(p.name)}">✕</button></span><span class="price" style="font-size:15px">${p.price?money(p.price*q):'por confirmar'}</span></div>`}).join(''):'<p class="mut">Aún no agregas productos.</p>';
+  $('#cartTot').textContent=money(cartTotal());$('#cnt').textContent=Object.values(cart).reduce((a,b)=>a+b,0);try{localStorage.setItem('enaco_cart',JSON.stringify(cart))}catch(e){}
+}
+$('#catalog').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const id=b.dataset.p||b.dataset.m;setQ(id,(cart[id]||0)+(b.dataset.p?1:-1));if(b.dataset.p)toast(prod(id).name+' agregado a tu pedido');});
+$('#cartList').addEventListener('click',e=>{const b=e.target.closest('[data-rm]');if(b)setQ(b.dataset.rm,0)});
+$('#q').addEventListener('input',renderCatalog);$('#ln').addEventListener('change',renderCatalog);
+$('#catalog').addEventListener('change',e=>{if(e.target.dataset.q)setQ(e.target.dataset.q,e.target.value)});
+const mis=()=>{try{return JSON.parse(localStorage.getItem('enaco_mis')||'[]')}catch(e){return[]}};
+const b64e=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))), b64d=s=>JSON.parse(decodeURIComponent(escape(atob(s))));
+let lastText='',lastOrder=null,barT=null;
+function runBar(o){const f=$('#progFill'),bar=$('#progBar');let p=0;clearInterval(barT);$('#pdfOrder').classList.add('hide');$('#pdfMsg').textContent='';
+  $('#dlTitle').textContent='Generando tu nota de pedido…';$('#dlState').textContent='Preparando el PDF del pedido '+o.code;f.style.width='0%';
+  const steps=['Registrando tus datos','Calculando el total con IGV','Armando el PDF','Iniciando la descarga'];
+  barT=setInterval(()=>{p=Math.min(100,p+4);f.style.width=p+'%';bar.setAttribute('aria-valuenow',p);$('#dlState').textContent=steps[Math.min(3,Math.floor(p/26))]+' · '+p+'%';
+    if(p>=100){clearInterval(barT);$('#dlTitle').textContent='Tu nota de pedido está lista';$('#dlState').textContent='Archivo: nota-pedido-'+o.code+'.pdf';
+      $('#pdfOrder').textContent='Descargar otra vez';$('#pdfOrder').classList.remove('hide');dl('nota-pedido-'+o.code+'.pdf',pdfNota(o),'application/pdf',$('#pdfMsg'));}},70);}
+$('#fPedido').addEventListener('submit',e=>{
+  e.preventDefault();const m=$('#fMsg');m.innerHTML='';
+  const c={dis:$('#cDis').value.trim(),ent:$('#cEnt').value,ref:$('#cRef').value.trim(),pago:$('#cPag').value,nombre:$('#cNom').value.trim(),comp:$('#cComp').value,doc:$('#cDoc').value.trim(),tel:$('#cTel').value.trim(),ciudad:$('#cCiu').value.trim(),dir:$('#cDir').value.trim(),correo:$('#cMail').value.trim()};
+  const errs=[];if(!Object.keys(cart).length)errs.push('Agrega al menos un producto.');
+  if(!c.nombre||!c.tel||!c.ciudad||!c.dis||!c.dir)errs.push('Completa nombre, celular, ciudad, distrito y dirección.');if(c.tel.replace(/\D/g,'').length<9)errs.push('Ingresa un celular de 9 dígitos.');
+  const dl=c.doc.replace(/\D/g,'').length;if(c.comp==='Factura'&&dl!==11)errs.push('Para factura ingresa un RUC de 11 dígitos.');if(c.comp==='Boleta'&&dl!==8&&dl!==11)errs.push('Ingresa un DNI de 8 dígitos o un RUC de 11.');
+  if(!$('#cOk').checked)errs.push('Debes autorizar el tratamiento de tus datos para enviar el pedido.');
+  if(errs.length){m.innerHTML=`<div class="msg err">${errs.map(esc).join('<br>')}</div>`;return}
+  const d=new Date(),code='ENC-'+d.toISOString().slice(0,10).replace(/-/g,'')+'-'+String(Math.floor(1000+Math.random()*9000));
+  const items=Object.entries(cart).map(([id,q])=>({id,q,p:prod(id).price||0}));
+  const o={code,date:d.toISOString(),c,items};lastOrder=o;try{const l=mis().filter(x=>x.code!==code);l.unshift({code,date:o.date,items:items.map(i=>[prod(i.id).name,i.q]),total:cartTotal()});localStorage.setItem('enaco_mis',JSON.stringify(l.slice(0,20)))}catch(e){}$('#pdfMsg').textContent='';
+  lastText=`*Pedido ENACO ${code}*\nCliente: ${c.nombre}\n${c.comp}: ${c.doc}\nCelular: ${c.tel}\nEntrega: ${c.ent} – ${c.dir}, ${c.dis}, ${c.ciudad}${c.ref?' (Ref.: '+c.ref+')':''}\nPago: ${c.pago}\n\nProductos:\n`+items.map(i=>`- ${prod(i.id).name} x ${i.q}${i.p?' = '+money(i.p*i.q):''}`).join('\n')+`\n\nTotal referencial: ${money(cartTotal())}\nAcepto el tratamiento de datos (Ley N.° 29733).\n\n#DATOS:${b64e(o)}`;
+  $('#orderTxt').textContent=lastText;
+  const wa=(db.cfg.wa||'').replace(/\D/g,'');
+  $('#waLink').href='https://wa.me/'+(wa||'')+'?text='+encodeURIComponent(lastText);
+  $('#doneCode').textContent=code;$('#trackLink').href='#seguimiento.'+code;$('#waNote').textContent=wa?'Se abrirá WhatsApp con el pedido ya escrito.':'Al abrir WhatsApp, elige el chat de ENACO y envía el mensaje.';
+  $('#fPedido').classList.add('hide');$('#done').classList.remove('hide');runBar(o);
+});
+$('#newOrder').addEventListener('click',()=>{cart={};$('#fPedido').reset();$('#cCiu').value='Piura';$('#cDis').value='Piura';$('#done').classList.add('hide');$('#fPedido').classList.remove('hide');renderCatalog();});
+
+/* ---------- panel ---------- */
+const stock=id=>{let ent=0,sal=0,res=0;db.moves.forEach(m=>{if(m.id===id)m.tipo==='Entrada'?ent+=m.q:sal+=m.q});
+  db.orders.forEach(o=>o.items.forEach(i=>{if(i.id!==id)return;if(DESCUENTA.includes(o.estado))sal+=i.q;else if(o.estado==='Registrado')res+=i.q}));
+  return{ent,sal,res,fis:ent-sal,disp:ent-sal-res}};
+const oTot=o=>o.items.reduce((s,i)=>s+i.q*(i.p||prod(i.id)?.price||0),0);
+function renderPed(){
+  const f=$('#fEst').value,qq=($('#qPed').value||'').toLowerCase(),list=db.orders.filter(o=>(!f||o.estado===f)&&(!qq||(o.code+' '+o.c.nombre+' '+(o.c.doc||'')+' '+(o.c.tel||'')).toLowerCase().includes(qq))).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  $('#tPed').innerHTML='<thead><tr><th>Código</th><th>Fecha</th><th>Cliente</th><th>Productos</th><th class="n">Total</th><th>Stock</th><th>Estado</th><th>Comprobante</th><th>Guía de remisión</th><th>Operador / seguimiento</th></tr></thead><tbody>'+
+  (list.length?list.map(o=>{const ok=o.items.every(i=>stock(i.id).disp>=0);return `<tr><td><b>${esc(o.code)}</b><br><button data-pdf="${esc(o.code)}" style="min-height:34px;padding:0 10px;font-size:13px;margin-top:6px">PDF</button> <a class="btn" target="_blank" rel="noopener" style="min-height:34px;padding:0 10px;font-size:13px;margin-top:6px" href="${cliWa(o)}">WhatsApp</a></td><td>${esc(new Date(o.date).toLocaleDateString('es-PE'))}</td><td>${esc(o.c.nombre)}<br><span class="mut">${esc(o.c.comp)} ${esc(o.c.doc)} · ${esc(o.c.tel)}<br>${esc(o.c.ent||'Envío a domicilio')}: ${esc(o.c.dir)}, ${esc(o.c.dis||'')} ${esc(o.c.ciudad)}${o.c.ref?'<br>Ref.: '+esc(o.c.ref):''}<br>Pago: ${esc(o.c.pago||'')}</span></td>
+   <td>${o.items.map(i=>esc((prod(i.id)?.name||i.id)+' × '+i.q)).join('<br>')}</td><td class="n">${money(oTot(o))}</td><td>${ok?'<span class="good">Disponible</span>':'<span class="warn">Sin stock</span>'}</td>
+   <td><select data-o="${esc(o.code)}" data-k="estado" class="st st-${o.estado}">${ESTADOS.map(s=>`<option${s===o.estado?' selected':''}>${s}</option>`).join('')}</select></td>
+   <td><input data-o="${esc(o.code)}" data-k="cpe" value="${esc(o.cpe)}" placeholder="B001-..." aria-label="Comprobante"></td><td><input data-o="${esc(o.code)}" data-k="gre" value="${esc(o.gre)}" placeholder="T001-..." aria-label="Guía"></td><td><input data-o="${esc(o.code)}" data-k="oper" value="${esc(o.oper)}" aria-label="Operador"></td></tr>`}).join(''):'<tr><td colspan="10" class="mut">Todavía no hay pedidos registrados. Pega arriba el primer mensaje recibido.</td></tr>')+'</tbody>';
+}
+$('#tPed').addEventListener('change',e=>{const t=e.target,o=db.orders.find(x=>x.code===t.dataset.o);if(!o)return;o[t.dataset.k]=t.value;
+  if(t.dataset.k==='estado'&&t.value==='Pagado'){const lack=o.items.filter(i=>stock(i.id).fis<0);if(lack.length){o.estado='Registrado';save();renderPed();$('#pMsg').innerHTML='<div class="msg err">No hay stock suficiente para pasar el pedido a Pagado.</div>';return}}
+  save();renderPed();});
+$('#fEst').innerHTML+=ESTADOS.map(s=>`<option>${s}</option>`).join('');$('#fEst').addEventListener('change',renderPed);
+$('#imp').addEventListener('click',()=>{const t=$('#paste').value,m=$('#pMsg'),k=t.match(/#DATOS:([A-Za-z0-9+/=]+)/);
+  if(!k){m.innerHTML='<div class="msg err">No se encontró el código de datos (#DATOS) en el mensaje. Pega el mensaje completo.</div>';return}
+  let o;try{o=b64d(k[1])}catch(e){m.innerHTML='<div class="msg err">El mensaje está incompleto o fue modificado.</div>';return}
+  if(db.orders.some(x=>x.code===o.code)){m.innerHTML=`<div class="msg err">El pedido ${esc(o.code)} ya estaba registrado.</div>`;return}
+  Object.assign(o,{estado:'Registrado',cpe:'',gre:'',oper:''});o.items=o.items.filter(i=>prod(i.id)).map(i=>({...i,p:i.p||prod(i.id).price||0}));
+  db.orders.push(o);save();$('#paste').value='';m.innerHTML=`<div class="msg ok">Pedido ${esc(o.code)} registrado.</div>`;renderPed();});
+function renderInv(){
+  $('#mPro').innerHTML=db.products.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+  $('#tStock').innerHTML='<thead><tr><th>Producto</th><th class="n">Entradas</th><th class="n">Salidas</th><th class="n">Stock físico</th><th class="n">Reservado</th><th class="n">Disponible</th><th class="n">Mínimo</th><th>Alerta</th></tr></thead><tbody>'+db.products.map(p=>{const s=stock(p.id);return `<tr><td>${esc(p.name)}</td><td class="n">${s.ent}</td><td class="n">${s.sal}</td><td class="n">${s.fis}</td><td class="n">${s.res}</td><td class="n"><b>${s.disp}</b></td><td class="n">${p.min}</td><td>${!p.active?'<span class="mut">Fuera de tienda</span>':s.disp<=p.min?'<span class="warn">Reponer stock</span>':'<span class="good">Normal</span>'}</td></tr>`}).join('')+'</tbody>';
+  const soon=Date.now()+90*864e5;
+  $('#tMov').innerHTML='<thead><tr><th>Fecha</th><th>Producto</th><th>Tipo</th><th class="n">Cantidad</th><th>Lote</th><th>Vence</th><th>Almacén</th></tr></thead><tbody>'+(db.moves.length?db.moves.slice().reverse().map(m=>`<tr><td>${esc(new Date(m.date).toLocaleDateString('es-PE'))}</td><td>${esc(prod(m.id)?.name||m.id)}</td><td>${esc(m.tipo)}</td><td class="n">${m.q}</td><td>${esc(m.lote)}</td><td${new Date(m.venc)<soon?' class="warn"':''}>${esc(m.venc)}</td><td>${esc(m.alm)}</td></tr>`).join(''):'<tr><td colspan="7" class="mut">Registra el primer ingreso de mercadería.</td></tr>')+'</tbody>';
+}
+$('#fMov').addEventListener('submit',e=>{e.preventDefault();const q=parseInt($('#mQ').value),m=$('#mMsg');
+  if(!(q>0)||!$('#mLote').value.trim()||!$('#mVen').value){m.innerHTML='<div class="msg err">Completa cantidad, lote y fecha de vencimiento.</div>';return}
+  db.moves.push({date:new Date().toISOString(),id:$('#mPro').value,tipo:$('#mTipo').value,q,lote:$('#mLote').value.trim(),venc:$('#mVen').value,alm:$('#mAlm').value});
+  save();e.target.reset();m.innerHTML='<div class="msg ok">Movimiento guardado.</div>';renderInv();});
+function delProds(ids){const m=$('#proMsg');if(!ids.length){m.innerHTML='<div class="msg err">Marca al menos un producto con la casilla de la izquierda.</div>';return}
+  const used=id=>db.orders.some(o=>o.items.some(i=>i.id===id))||db.moves.some(x=>x.id===id),ok=ids.filter(id=>!used(id)),no=ids.filter(used);
+  if(!ok.length){m.innerHTML='<div class="msg err">No se puede eliminar: tiene pedidos o movimientos de inventario. Para sacarlo de la tienda, ponlo en «En tienda: No».</div>';return}
+  const nm=ok.map(id=>prod(id).name||id).join(', ');if(!confirm('¿Eliminar '+(ok.length>1?ok.length+' productos':'este producto')+'?\n'+nm+'\nEsta acción no se puede deshacer.'))return;
+  db.products=db.products.filter(x=>!ok.includes(x.id));ok.forEach(id=>delete cart[id]);save();renderAll();
+  $('#proMsg').innerHTML='<div class="msg ok">Eliminado: '+esc(nm)+'.'+(no.length?' No se eliminó '+no.map(esc).join(', ')+' porque tiene historial; ponlo en «En tienda: No».':'')+'</div>'}
+$('#tPro').addEventListener('click',e=>{const b=e.target.closest('[data-del]');if(b)delProds([b.dataset.del])});
+$('#delSel').addEventListener('click',()=>delProds($$('#tPro [data-sel]:checked').map(c=>c.dataset.sel)));
+function fotoSel(){const s=$('#fotoPro'),c=s.value;s.innerHTML=db.products.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}${p.img?' (con foto)':''}</option>`).join('');if(c)s.value=c}
+$('#fotoIn').addEventListener('change',e=>{const f=e.target.files[0],m=$('#fotoMsg'),p=prod($('#fotoPro').value);if(!f||!p)return;
+  if(!f.type.startsWith('image/')){m.innerHTML='<div class="msg err">Elige un archivo de imagen.</div>';return}
+  const im=new Image();im.onload=()=>{const r=Math.min(1,640/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=Math.round(im.width*r);cv.height=Math.round(im.height*r);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);
+    p.img=cv.toDataURL('image/jpeg',.82);save();renderCatalog();fotoSel();e.target.value='';m.innerHTML='<div class="msg ok">Foto guardada para '+esc(p.name)+'.</div>'};
+  im.onerror=()=>{m.innerHTML='<div class="msg err">No se pudo leer la imagen.</div>'};im.src=URL.createObjectURL(f)});
+$('#fotoDel').addEventListener('click',()=>{const p=prod($('#fotoPro').value);if(p){delete p.img;save();renderCatalog();fotoSel();$('#fotoMsg').innerHTML='<div class="msg ok">Foto quitada.</div>'}});
+function renderPro(){fotoSel();
+  $('#tPro').innerHTML='<thead><tr><th>Sel.</th><th>Código</th><th>Producto</th><th>Línea</th><th>Descripción</th><th class="n">Precio (S/)</th><th class="n">Stock mínimo</th><th>En tienda</th><th>Acción</th></tr></thead><tbody>'+db.products.map((p,i)=>`<tr>
+   <td><input type="checkbox" data-sel="${esc(p.id)}" aria-label="Seleccionar ${esc(p.name||p.id)}" style="width:22px;min-width:0;min-height:22px"></td><td>${esc(p.id)}</td><td><input data-i="${i}" data-k="name" value="${esc(p.name)}" aria-label="Nombre"></td><td><input data-i="${i}" data-k="line" value="${esc(p.line)}" aria-label="Línea"></td><td><input data-i="${i}" data-k="desc" value="${esc(p.desc)}" aria-label="Descripción"></td>
+   <td class="n"><input data-i="${i}" data-k="price" type="number" min="0" step="0.10" value="${p.price??''}" aria-label="Precio" style="width:100px"></td><td class="n"><input data-i="${i}" data-k="min" type="number" min="0" value="${p.min}" aria-label="Mínimo" style="width:90px"></td>
+   <td><select data-i="${i}" data-k="active" aria-label="En tienda"><option value="1"${p.active?' selected':''}>Sí</option><option value="0"${p.active?'':' selected'}>No</option></select></td><td><button type="button" data-del="${esc(p.id)}" style="min-height:38px;padding:0 12px">Eliminar</button></td></tr>`).join('')+'</tbody>';
+}
+$('#tPro').addEventListener('change',e=>{const t=e.target,p=db.products[t.dataset.i];if(!p)return;const k=t.dataset.k;
+  p[k]=k==='price'?(t.value===''?null:Math.max(0,parseFloat(t.value))):k==='min'?Math.max(0,parseInt(t.value)||0):k==='active'?t.value==='1':t.value;save();renderCatalog();});
+$('#addPro').addEventListener('click',()=>{const n=Math.max(0,...db.products.map(q=>parseInt(q.id.slice(1))||0))+1;db.products.push({id:'P'+String(n).padStart(3,'0'),name:'Nuevo producto',line:'',desc:'',price:null,min:0,active:false});save();renderPro();});
+const bars=(el,rows,fmt)=>{const mx=Math.max(1,...rows.map(r=>r[1]));el.innerHTML=rows.length?rows.map(([l,v])=>`<div class="bar"><span>${esc(l)}</span><i style="width:${v/mx*100}%"></i><span class="n">${fmt(v)}</span></div>`).join(''):'<p class="mut">Sin datos todavía.</p>'};
+function renderInd(){
+  const conf=db.orders.filter(o=>DESCUENTA.includes(o.estado)),ventas=conf.reduce((s,o)=>s+oTot(o),0),ent=db.orders.filter(o=>o.estado==='Entregado').length;
+  const alert=db.products.filter(p=>p.active&&stock(p.id).disp<=p.min).length;
+  const k=[['Pedidos registrados',db.orders.length],['Ventas confirmadas',money(ventas)],['Ticket promedio',money(conf.length?ventas/conf.length:0)],['Pedidos entregados',ent],['Productos por reponer',alert]];
+  $('#kpis').innerHTML=k.map(([l,v])=>`<div class="kpi"><span class="mut">${l}</span><b>${esc(v)}</b></div>`).join('');
+  bars($('#bEst'),ESTADOS.map(s=>[s,db.orders.filter(o=>o.estado===s).length]).filter(r=>r[1]),v=>v);
+  const bp={},bc={};conf.forEach(o=>{o.items.forEach(i=>{const n=prod(i.id)?.name||i.id;bp[n]=(bp[n]||0)+i.q*(i.p||0)});bc[o.c.ciudad]=(bc[o.c.ciudad]||0)+oTot(o)});
+  bars($('#bPro'),Object.entries(bp).sort((a,b)=>b[1]-a[1]),money);bars($('#bCiu'),Object.entries(bc).sort((a,b)=>b[1]-a[1]),money);
+}
+function renderCfg(){$('#gWa').value=db.cfg.wa||'';$('#gRec').value=db.cfg.rec||'';$('#gUrl').value=db.cfg.url||''}
+$('#fCfg').addEventListener('submit',e=>{e.preventDefault();db.cfg.wa=$('#gWa').value.replace(/\D/g,'');db.cfg.rec=$('#gRec').value.trim();db.cfg.url=$('#gUrl').value.trim();save();renderCatalog();$('#gMsg').innerHTML='<div class="msg ok">Configuración guardada.</div>';});
+let dlNS;const getDL=async()=>{if(dlNS!==undefined)return dlNS;try{dlNS=window.claude&&window.claude.use?await window.claude.use('downloads'):false}catch(e){dlNS=false}return dlNS};
+const dl=async(name,data,type,msgEl)=>{const m=msgEl||$('#bMsg');const blob=data instanceof Blob?data:new Blob([data],{type});
+  const ns=await getDL();
+  if(ns){try{await ns.save({filename:name,data:blob});if(m)m.innerHTML='<div class="msg ok">Archivo guardado.</div>'}catch(e){if(m)m.innerHTML='<div class="msg err">'+(e&&e.code==='declined'?'Descarga cancelada.':'No se pudo guardar el archivo en esta vista.')+'</div>'}return}
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove()}catch(e){if(m)m.innerHTML='<div class="msg err">Este navegador no permitió la descarga.</div>'}};
+/* ---- PDF de nota de pedido (generador propio, sin librerías) ---- */
+function pdfNota(o){
+  const W=595,H=842,ops=[];const enc=t=>String(t??'').replace(/[–—]/g,'-').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/×/g,'x').replace(/[^\x20-\xff]/g,'?').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
+  const T=(x,y,t,sz=10,b=0,col='0 0 0')=>ops.push(`BT ${col} rg /F${b?2:1} ${sz} Tf ${x} ${H-y} Td (${enc(t)}) Tj ET`);
+  const TR=(xr,y,t,sz=10,b=0)=>{const w=String(t).length*sz*(b?.56:.52);T(xr-w,y,t,sz,b)};
+  const rect=(x,y,w,h,col)=>ops.push(`${col} rg ${x} ${H-y-h} ${w} ${h} re f`);
+  const line=(x1,y1,x2,y2,col='0.8 0.85 0.82')=>ops.push(`${col} RG 0.8 w ${x1} ${H-y1} m ${x2} ${H-y2} l S`);
+  const wrap=(t,n)=>{const out=[];let cur='';String(t).split(' ').forEach(w=>{if((cur+' '+w).trim().length>n){out.push(cur.trim());cur=w}else cur+=' '+w});if(cur.trim())out.push(cur.trim());return out};
+  rect(0,0,W,86,'0.114 0.353 0.208');T(40,38,'ENACO S.A.',20,1,'1 1 1');T(40,58,'Empresa Nacional de la Coca S.A. - RUC 20114883230',10,0,'1 1 1');
+  T(40,73,'Av. Arequipa N.° 4528, Miraflores, Lima',9,0,'1 1 1');
+  rect(380,18,175,52,'1 1 1');T(392,38,'NOTA DE PEDIDO',13,1,'0.114 0.353 0.208');T(392,58,o.code,11,1);
+  let y=112;const c=o.c,d=new Date(o.date);
+  T(40,y,'Fecha del pedido:',10,1);T(150,y,d.toLocaleDateString('es-PE')+' '+d.toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'}));
+  T(330,y,'Estado:',10,1);T(380,y,o.estado||'Pedido enviado');y+=22;
+  rect(40,y-12,515,18,'0.914 0.949 0.925');T(48,y+1,'DATOS DEL CLIENTE',10,1);y+=24;
+  const rows=[['Nombre / razón social',c.nombre],['Comprobante solicitado',c.comp+' - '+(c.comp==='Factura'?'RUC ':'DNI/RUC ')+c.doc],['Celular',c.tel],['Correo',c.correo||'-'],
+    ['Entrega',(c.ent||'Envío a domicilio')],['Dirección',c.dir+', '+(c.dis||'')+', '+c.ciudad],['Referencia',c.ref||'-'],['Forma de pago',c.pago||'-']];
+  rows.forEach(([k,v])=>{T(48,y,k+':',9.5,1);wrap(v,62).forEach((l,i)=>T(185,y+i*13,l,9.5));y+=Math.max(1,wrap(v,62).length)*13+3});
+  y+=10;rect(40,y-12,515,18,'0.114 0.353 0.208');T(48,y+1,'Producto',9.5,1,'1 1 1');T(330,y+1,'Cant.',9.5,1,'1 1 1');T(390,y+1,'P. unit.',9.5,1,'1 1 1');T(480,y+1,'Subtotal',9.5,1,'1 1 1');y+=22;
+  let tot=0,pend=false;o.items.forEach(i=>{const p=prod(i.id),pu=i.p||p?.price||0,sub=pu*i.q;tot+=sub;if(!pu)pend=true;
+    T(48,y,p?.name||i.id,9.5);TR(355,y,String(i.q),9.5);TR(440,y,pu?money(pu):'por confirmar',9.5);TR(547,y,pu?money(sub):'-',9.5);line(40,y+6,555,y+6);y+=20});
+  y+=6;T(360,y,'TOTAL',12,1);TR(547,y,money(tot),12,1);y+=14;T(360,y,'Precios incluyen IGV.',8.5,0,'0.35 0.42 0.38');
+  if(pend){y+=12;T(360,y,'Hay precios por confirmar.',8.5,0,'0.35 0.42 0.38')}
+  y+=26;if(o.cpe||o.gre){T(48,y,'Comprobante electrónico emitido en SUNAT: '+(o.cpe||'-')+'    Guía de remisión: '+(o.gre||'-'),9.5,1);y+=16}
+  if(o.oper){T(48,y,'Operador / seguimiento: '+o.oper,9.5);y+=16}
+  y+=8;rect(40,y-12,515,74,'1 0.969 0.882');
+  ['Este documento es una nota de pedido y no es un comprobante de pago.','La boleta o factura electrónica se emite en el portal SEE-SOL de la SUNAT al confirmarse','el pago y se envía al cliente por WhatsApp o correo.','Datos tratados conforme a la Ley N.° 29733, solo para gestionar este pedido.'].forEach((l,i)=>T(50,y+3+i*14,l,9));
+  T(40,812,'Prototipo académico - Comercio Electrónico, Universidad Nacional de Piura. No es el canal oficial de venta de ENACO S.A.',7.5,0,'0.4 0.45 0.42');
+  const content=ops.join('\n');const objs=['<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+   `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>`,
+   '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>',
+   `<< /Length ${content.length} >>\nstream\n${content}\nendstream`];
+  let pdf='%PDF-1.4\n%\xe2\xe3\xcf\xd3\n',offs=[];objs.forEach((ob,k)=>{offs.push(pdf.length);pdf+=`${k+1} 0 obj\n${ob}\nendobj\n`});
+  const xref=pdf.length;pdf+=`xref\n0 ${objs.length+1}\n0000000000 65535 f \n`+offs.map(n=>String(n).padStart(10,'0')+' 00000 n \n').join('')+`trailer\n<< /Size ${objs.length+1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+  const bytes=new Uint8Array(pdf.length);for(let k=0;k<pdf.length;k++)bytes[k]=pdf.charCodeAt(k)&255;return new Blob([bytes],{type:'application/pdf'});
+}
+$('#bkCopy').addEventListener('click',async e=>{try{await navigator.clipboard.writeText(JSON.stringify(db));e.target.textContent='Respaldo copiado'}catch(err){$('#bkIn').value=JSON.stringify(db);$('#bMsg').innerHTML='<div class="msg ok">El respaldo está en el cuadro de abajo: selecciónalo y cópialo.</div>'}});
+$('#bkDown').addEventListener('click',()=>dl('respaldo-enaco.json',JSON.stringify(db),'application/json'));
+$('#pdfOrder').addEventListener('click',()=>{if(lastOrder)dl('nota-pedido-'+lastOrder.code+'.pdf',pdfNota(lastOrder),'application/pdf',$('#pdfMsg'))});
+$('#tPed').addEventListener('click',e=>{const b=e.target.closest('button[data-pdf]');if(!b)return;const o=db.orders.find(x=>x.code===b.dataset.pdf);if(o)dl('nota-pedido-'+o.code+'.pdf',pdfNota(o),'application/pdf',$('#pMsg'))});
+$('#csvDown').addEventListener('click',()=>{const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const rows=[['Código','Fecha','Cliente','Documento','Celular','Ciudad','Distrito','Dirección','Entrega','Pago','Producto','Cantidad','Precio','Subtotal','Estado','Comprobante','Guía','Operador']];
+  db.orders.forEach(o=>o.items.forEach(i=>rows.push([o.code,o.date.slice(0,10),o.c.nombre,o.c.doc,o.c.tel,o.c.ciudad,o.c.dis||'',o.c.dir,o.c.ent||'',o.c.pago||'',prod(i.id)?.name||i.id,i.q,i.p,i.q*i.p,o.estado,o.cpe,o.gre,o.oper])));
+  dl('pedidos-enaco.csv','﻿'+rows.map(r=>r.map(q).join(';')).join('\n'),'text/csv');});
+$('#clrDemo').addEventListener('click',e=>{if(e.target.dataset.c!=='1'){e.target.dataset.c='1';e.target.textContent='Pulsa otra vez para confirmar';return}db.orders=[];db.moves=[];save();renderAll();e.target.dataset.c='';e.target.textContent='Datos vaciados';});
+$('#fPw').addEventListener('submit',e=>{e.preventDefault();const m=$('#pwMsg'),a=$('#pwOld').value,n=$('#pwNew').value,n2=$('#pwNew2').value;
+  if(a!==db.cfg.pw){m.innerHTML='<div class="msg err">La clave actual no es correcta.</div>';return}
+  if(n.length<6){m.innerHTML='<div class="msg err">La nueva clave debe tener al menos 6 caracteres.</div>';return}
+  if(n!==n2){m.innerHTML='<div class="msg err">Las dos claves nuevas no coinciden.</div>';return}
+  db.cfg.pw=n;save();e.target.reset();m.innerHTML='<div class="msg ok">Clave cambiada. Úsala la próxima vez que ingreses.</div>';});
+$('#bkRest').addEventListener('click',()=>{try{const n=JSON.parse($('#bkIn').value);if(!n.products||!n.orders)throw 0;db=n;save();renderAll();$('#bMsg').innerHTML='<div class="msg ok">Respaldo restaurado.</div>'}catch(e){$('#bMsg').innerHTML='<div class="msg err">El contenido no es un respaldo válido.</div>'}});
+function trackBase(){return (db.cfg.url||'').trim()||(location.protocol.startsWith('http')?location.href:'')}
+function trackUrl(o){const b=trackBase().split('#')[0];if(!b)return'';return b+'#seguimiento.'+b64e({k:o.code,d:o.date,e:o.estado,i:o.items.map(i=>[prod(i.id)?.name||i.id,i.q]),t:oTot(o),f:o.cpe||'',o:o.oper||'',g:new Date().toISOString()})}
+function cliWa(o){let t=String(o.c.tel||'').replace(/\D/g,'');if(t.length===9)t='51'+t;const n=(o.c.nombre||'').split(' ')[0],k=o.code,msg={Registrado:`recibimos tu pedido ${k} por ${money(oTot(o))}. Te confirmamos el stock y los datos para el pago.`,Pagado:`confirmamos el pago de tu pedido ${k}. Estamos preparándolo.`,Preparado:`tu pedido ${k} ya está preparado.`,Facturado:`emitimos tu comprobante ${o.cpe||''} del pedido ${k}.`,Enviado:`tu pedido ${k} fue enviado${o.oper?' ('+o.oper+')':''}.`,Entregado:`gracias por tu compra. Tu pedido ${k} figura como entregado.`,Anulado:`tu pedido ${k} fue anulado.`}[o.estado]||'';
+  return 'https://wa.me/'+t+'?text='+encodeURIComponent('Hola '+n+', '+msg+(trackUrl(o)?'\nSigue tu pedido aquí: '+trackUrl(o):'')+'\n— ENACO S.A.')}
+function updateBadges(){try{const n=db.orders.filter(o=>['Registrado','Pagado','Preparado'].includes(o.estado)).length,r=db.products.filter(p=>p.active&&p.min>0&&stock(p.id).disp<=p.min).length;$('#trkHint').textContent=trackBase()?'':'Para incluir el enlace de seguimiento en los mensajes al cliente, escribe la dirección web de la tienda en Configuración.';$('#bPed').textContent=n||'';$('#bPed').title=n+' pedidos por atender';$('#bInv').textContent=r||'';$('#bInv').title=r+' productos por reponer'}catch(e){}}
+$('#qPed').addEventListener('input',renderPed);
+const isDark=()=>document.documentElement.dataset.theme?document.documentElement.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+$('#theme').addEventListener('click',()=>{const t=isDark()?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('enaco_theme',t)}catch(e){}});
+function renderAll(){renderCatalog();renderPed();renderInv();renderPro();renderInd();renderCfg();updateBadges()}
+let logged=false;try{logged=sessionStorage.getItem('enaco_in')==='1'}catch(e){}
+function showPanel(){$('#login').classList.toggle('hide',logged);$('#app').classList.toggle('hide',!logged);$('#loginHint').innerHTML=db.cfg.pw==='enaco2026'?'Ingresa la clave del personal autorizado.<br>Por seguridad, cámbiala en Configuración después de ingresar.':'Ingresa la clave del personal autorizado.';if(logged)renderAll();}
+$('#fLogin').addEventListener('submit',e=>{e.preventDefault();const v=$('#pw').value;if(!v){$('#lMsg').innerHTML='<div class="msg err">Escribe una clave.</div>';return}
+  if(!db.cfg.pw){db.cfg.pw=v;save()}if(v!==db.cfg.pw){$('#lMsg').innerHTML='<div class="msg err">Clave incorrecta.</div>';return}
+  logged=true;try{sessionStorage.setItem('enaco_in','1')}catch(e){}$('#pw').value='';$('#lMsg').innerHTML='';showPanel();});
+$('#logout').addEventListener('click',()=>{logged=false;try{sessionStorage.removeItem('enaco_in')}catch(e){}showPanel()});
+$$('.tabs button[data-t]').forEach(b=>b.addEventListener('click',()=>{$$('.tabs button[data-t]').forEach(x=>x.classList.toggle('on',x===b));$$('[data-p]').forEach(p=>p.classList.toggle('hide',p.dataset.p!==b.dataset.t));renderAll();}));
+const FASES=['Registrado','Pagado','Preparado','Facturado','Enviado','Entregado'];
+const FDESC={Registrado:'ENACO registró tu pedido y confirma el stock.',Pagado:'Pago confirmado.',Preparado:'Tu pedido está empacado.',Facturado:'Se emitió tu comprobante electrónico.',Enviado:'Tu pedido va en camino.',Entregado:'Pedido entregado. ¡Gracias por tu compra!'};
+function findOrder(code){code=code.trim().toUpperCase();const o=db.orders.find(x=>x.code===code);
+  if(o)return{code:o.code,date:o.date,estado:o.estado,items:o.items.map(i=>[prod(i.id)?.name||i.id,i.q]),total:oTot(o),cpe:o.cpe,oper:o.oper};
+  const m=mis().find(x=>x.code===code);return m?{...m,estado:'Pendiente'}:null}
+function showTrack(r){const an=r.estado==='Anulado',idx=FASES.indexOf(r.estado),cur=Math.max(1,idx+1),fin=idx===FASES.length-1;
+  const st=[['Pedido enviado','Enviaste tu pedido por WhatsApp.'],...FASES.map(f=>[f,FDESC[f]])].map(([t,d],i)=>{const c=an?'off':i<cur||(fin&&i===cur)?'ok':i===cur?'now':'wait';return `<li class="${c}"><i>${c==='ok'?'✓':i===cur&&!an?'●':''}</i><b>${esc(t)}</b><br><span class="mut">${i===cur&&!an&&r.estado==='Pendiente'?'Esperando que ENACO confirme tu pedido.':esc(d)}</span></li>`}).join('');
+  $('#sRes').innerHTML=`<div class="box" style="margin-top:14px"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><span class="mut">Pedido</span><h2 style="margin:0">${esc(r.code)}</h2><span class="mut">${esc(new Date(r.date).toLocaleDateString('es-PE'))}</span></div><div class="price">${money(r.total)}</div></div>
+  ${an?'<div class="msg err">Este pedido fue anulado. Escríbenos por WhatsApp si necesitas ayuda.</div>':''}<ol class="tl">${st}</ol>
+  <h3>Productos</h3>${r.items.map(([n,q])=>`<div class="row"><span>${esc(n)}</span><span>× ${q}</span></div>`).join('')}
+  ${r.cpe?`<p><b>Comprobante:</b> ${esc(r.cpe)}</p>`:''}${r.oper?`<p><b>Seguimiento del envío:</b> ${esc(r.oper)}</p>`:''}
+  <p class="mut">${r.g?'Estado al '+esc(new Date(r.g).toLocaleString('es-PE'))+'. Si ya pasó tiempo, pide a ENACO el enlace actualizado por WhatsApp.':r.estado==='Pendiente'?'El avance se actualiza cuando ENACO registre tu pedido. Para ver cada cambio, usa el enlace de seguimiento que ENACO te envía por WhatsApp.':'Estado actual del pedido.'}</p></div>`}
+function routeSeg(){const v=location.hash.slice('#seguimiento'.length).replace(/^\./,''),m=$('#sMsg');m.innerHTML='';$('#sRes').innerHTML='';
+  const l=mis();$('#sMis').innerHTML=l.length?'<h3 style="margin-top:20px">Mis pedidos en este equipo</h3>'+l.map(x=>`<div class="row"><a href="#seguimiento.${esc(x.code)}">${esc(x.code)}</a><span class="mut">${esc(new Date(x.date).toLocaleDateString('es-PE'))}</span></div>`).join(''):'';
+  if(!v)return;let r=null;
+  if(/^ENC-/i.test(v)){$('#sCod').value=v;r=findOrder(v);if(!r)m.innerHTML='<div class="msg err">No encontramos ese código en este equipo. Si compraste desde otro dispositivo, abre el enlace de seguimiento que te envió ENACO.</div>'}
+  else{try{const d=b64d(v);r={code:d.k,date:d.d,estado:d.e,items:d.i,total:d.t,cpe:d.f,oper:d.o,g:d.g};$('#sCod').value=d.k}catch(e){m.innerHTML='<div class="msg err">El enlace está incompleto. Pide a ENACO que lo envíe de nuevo.</div>'}}
+  if(r)showTrack(r)}
+$('#fSeg').addEventListener('submit',e=>{e.preventDefault();const c=$('#sCod').value.trim().toUpperCase();if(!c){$('#sMsg').innerHTML='<div class="msg err">Escribe el código de tu pedido.</div>';return}const h='#seguimiento.'+c;if(location.hash===h)route();else location.hash=h});
+function route(){const h=location.hash,p=h==='#panel',sg=h.startsWith('#seguimiento');$('#vTienda').classList.toggle('hide',p||sg);$('#vSeg').classList.toggle('hide',!sg);$('#vPanel').classList.toggle('hide',!p);$('#nTienda').classList.toggle('on',!p&&!sg);$('#nSeg').classList.toggle('on',sg);$('#nPanel').classList.toggle('on',p);if(p)showPanel();else if(sg){routeSeg();scrollTo(0,0)}else renderCatalog();}
+window.addEventListener('hashchange',route);route();
+}
+</script>
+</body>
+</html>
